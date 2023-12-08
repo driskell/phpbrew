@@ -269,6 +269,24 @@ class VariantBuilder
         };
 
         $this->variants['pcre'] = function (ConfigureParameters $params, Build $build, $value) {
+            // Apple Silicon will crash on 8.0 due to bug in bundle PCRE2 so get an updated version if we can
+            // PHP 8.1 and above already have the fix bundled
+            if ($build->compareVersion('8.0') >= 0 && $build->compareVersion('8.1') < 0 && $build->osName === 'Darwin' && $build->osArch === 'arm64') {
+                $prefix = Utils::findPrefix(array(
+                    new UserProvidedPrefix($value),
+                    new IncludePrefixFinder('pcre2.h'),
+                    new BrewPrefixFinder('pcre2'),
+                ));
+
+                if ($prefix === null) {
+                    throw new Exception('Unable to find PCRE2 library. PHP 8.0 on Apple Silicon requires a newer version of PCRE2 than is bundled with PHP 8.0.');
+                }
+
+                $params = $params->withOption('--with-external-pcre', $prefix);
+                return $params;
+            }
+
+            // PCRE is bundled with PHP since 7.4
             if ($build->compareVersion('7.4') >= 0) {
                 return $params;
             }
