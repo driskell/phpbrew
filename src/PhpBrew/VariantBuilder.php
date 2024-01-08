@@ -231,6 +231,15 @@ class VariantBuilder
                 new IncludePrefixFinder('openssl/opensslv.h'),
             ));
 
+            // OpenSSL 3 removes RSA_SSLV23_PADDING and so is not compatible with PHP < 8.1, and Homebrew defaults to openssl@3
+            // If we detect homebrew openssl@3, which is the default, change it to openssl@1.1
+            if ($opensslPrefix !== null && $build->compareVersion('8.1') < 0 && $opensslPrefix === (new BrewPrefixFinder('openssl@3'))->findPrefix()) {
+                $opensslPrefix = (new BrewPrefixFinder('openssl@1.1'))->findPrefix();
+                if ($opensslPrefix === null) {
+                    throw new Exception('PHP < 8.1 requires openssl@1.1.');
+                }
+            }
+
             return $params->withOption('--with-imap', $imapPrefix)
                 ->withOptionOrPkgConfigPath($build, '--with-kerberos', $kerberosPrefix)
                 ->withOptionOrPkgConfigPath($build, '--with-imap-ssl', $opensslPrefix);
