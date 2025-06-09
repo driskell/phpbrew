@@ -40,6 +40,10 @@ class BuildTask extends BaseTask
             $cmd->addArg("-j{$makeJobs}");
         }
 
+        if ($build->getEnvironmentVariables()) {
+            $cmd->env($build->getEnvironmentVariables());
+        }
+
         $this->debug($cmd->buildCommand());
 
         if (!$this->options->dryrun) {

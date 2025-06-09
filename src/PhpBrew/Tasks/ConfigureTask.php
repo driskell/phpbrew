@@ -39,6 +39,10 @@ class ConfigureTask extends BaseTask
             $this->logger->info('   $ tail -F ' . escapeshellarg($buildLogPath) . PHP_EOL . PHP_EOL);
         }
 
+        if ($build->getEnvironmentVariables()) {
+            $cmd->env($build->getEnvironmentVariables());
+        }
+
         $this->debug($cmd->buildCommand());
 
         if ($this->options->nice) {
