@@ -67,6 +67,11 @@ class Build implements Buildable
     public $osArch;
 
     /**
+     * Environment variables for the build.
+     */
+    public $environmentVariables = array();
+
+    /**
      * Construct a Build object,.
      *
      * A build object contains the information of all build options, prefix, paths... etc
@@ -246,6 +251,11 @@ class Build implements Buildable
         }
 
         return self::STATE_NONE;
+    }
+
+    public function getEnvironmentVariables()
+    {
+        return $this->environmentVariables;
     }
 
     public function __call($m, $a)

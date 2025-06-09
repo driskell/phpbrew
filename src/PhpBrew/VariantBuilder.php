@@ -522,6 +522,12 @@ class VariantBuilder
                 }
             }
 
+            if ($build->compareVersion('8.2') < 0) {
+                // Work around to support icu4c 75, which needs C++17
+                $build->environmentVariables['ICU_CXXFLAGS'] = '-std=c++17';
+                var_dump($build->environmentVariables);
+            }
+
             return $parameters;
         };
 
